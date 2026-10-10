@@ -1,1 +1,0 @@
-proxium-miniapp
