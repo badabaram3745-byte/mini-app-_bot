@@ -1,1 +1,1 @@
-# mini-app-_bot
+proxium-miniapp
