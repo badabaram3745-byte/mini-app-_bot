@@ -723,7 +723,8 @@ def fetched_kb(d):
     if page < pages - 1:
         nav.append(btn("بعدی ➡️", f"ad:fp:{page + 1}"))
     rows.append(nav)
-    rows.append([btn("🧪 تست همه مدل‌ها", "ad:fall", "success")])
+    rows.append([btn("🧪 تست همین صفحه", "ad:fpage", "primary"),
+                 btn("🧪 تست همه مدل‌ها", "ad:fall", "success")])
     rows.append([btn("🔙 برگشت به سرویس", f"ad:pv:{d['pid']}")])
     return kb(*rows)
 
@@ -1007,6 +1008,26 @@ async def admin_cb(bot, uid, mid, d):
             note = f"❌ <b>تست ناموفق</b>\n<code>{e(str(ex)[:300])}</code>\n\n"
             st["d"].setdefault("failed", set()).add(i)
         return await show_fetched(bot, uid, mid, note)
+    if cmd == "fpage":
+        st = STATE.get(uid)
+        if not st or st["s"] != "f_list":
+            return await prov_list(bot, uid, mid)
+        d = st["d"]
+        p = db.get_provider(d["pid"])
+        page = d.get("page", 0)
+        per = 8
+        start = page * per
+        page_indices = range(start, min(len(d["view"]), start + per))
+        await show(bot, uid, mid, "🧪 دارم مدل‌های همین صفحه رو تست می‌کنم، چند لحظه صبر کن...")
+        for i in page_indices:
+            model_id = d["view"][i]
+            try:
+                await ai.chat(p, model_id, [{"role": "user", "content": "Reply only: OK"}])
+                d.setdefault("tested", set()).add(i)
+                d.setdefault("failed", set()).discard(i)
+            except Exception:
+                d.setdefault("failed", set()).add(i)
+        return await show_fetched(bot, uid, mid, "✅ تست مدل‌های همین صفحه تمام شد.\n\n")
     if cmd == "fall":
         st = STATE.get(uid)
         if not st or st["s"] != "f_list":
