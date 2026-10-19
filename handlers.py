@@ -293,7 +293,7 @@ def section_kb(sec):
     rows = [[btn("🔄 تغییر هوش مصنوعی", f"pick:{sec}", "primary")]]
     if sec == "chat":
         rows.append([btn("🧹 شروع چت جدید", "m:newchat", "danger")])
-    rows.append(HOME)
+    rows.append([btn("🏠 بازگشت به منوی اصلی", "m:home")])
     return kb(*rows)
 
 
@@ -342,7 +342,7 @@ async def pick_model(bot, uid, sec, mid, page=0):
     if page < pages - 1:
         nav.append(btn("بعدی ➡️", f"pickp:{sec}:{page + 1}"))
     rows.append(nav)
-    rows.append([btn("🔙 برگشت", f"m:{sec}")])
+    rows.append([btn("🔙 بازگشت به بخش", f"m:{sec}")])
     await show(bot, uid, mid,
                f"{SEC_ICON[sec]} <b>هوش مصنوعی را انتخاب کن</b>\n\n"
                "روی نام هر هوش مصنوعی بزن تا همه نسخه‌های همان سرویس را ببینی 👇",
@@ -378,7 +378,7 @@ async def brand_models_page(bot, uid, sec, brand, mid, page=0):
         nav.append(btn("بعدی ➡️", f"brandp:{sec}:{brand}:{page + 1}"))
     if nav:
         rows.append(nav)
-    rows.append([btn("🔙 برگشت به هوش‌های مصنوعی", f"pick:{sec}")])
+    rows.append([btn("🔙 بازگشت به فهرست هوش‌ها", f"pick:{sec}")])
     text = f"{icon} <b>{e(brand)}</b>\n\n"
     if models:
         text += "نسخه موردنظرت را انتخاب کن 👇"
@@ -477,7 +477,9 @@ async def on_callback(bot, cq):
     if data == "m:home":
         return await show_main(bot, uid, mid, cq["from"].get("first_name", ""))
     if data in ("m:chat", "m:image", "m:video"):
-        return await pick_model(bot, uid, data[2:], mid, 0)
+        # Main-menu section buttons open the section directly. This also makes
+        # the back button from the model picker reliable for all three modes.
+        return await open_section(bot, uid, data[2:], mid)
     if data == "m:me":
         return await account(bot, uid, mid)
     if data == "m:help":
