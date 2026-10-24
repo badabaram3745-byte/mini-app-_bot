@@ -3,6 +3,7 @@ import logging
 import sys
 
 import handlers
+import extras  # noqa: F401  (additive upgrades, see extras.py)
 from config import ADMIN_IDS, BOT_TOKEN
 from tg import Bot
 
