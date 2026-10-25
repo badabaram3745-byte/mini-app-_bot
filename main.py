@@ -4,6 +4,7 @@ import sys
 
 import handlers
 import extras  # noqa: F401  (additive upgrades, see extras.py)
+import pro  # noqa: F401  (subscription, chat archive, admin tools, see pro.py)
 from config import ADMIN_IDS, BOT_TOKEN
 from tg import Bot
 
